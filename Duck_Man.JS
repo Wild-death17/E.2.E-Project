@@ -22,7 +22,7 @@ const JUMP_SPEED = 4;
 let Yval;
 let isJumping = false;
 document.addEventListener("keydown", (e) => {
-  if (Update == undefined) return;
+  if (Update === undefined) return;
   if (e.code === "Space" && !isJumping) {
     Yval = JUMP_SPEED;
     isJumping = true;
@@ -35,7 +35,6 @@ document.addEventListener("keydown", (e) => {
   }
 });
 function Jump() {
-  if (!isJumping) return;
   let duck = document.querySelector(".Character");
   increaseObjectProp(duck, "--bottom", Yval);
   if (getObjectProp(duck, "--bottom") <= 0) {
@@ -50,7 +49,8 @@ let NextObject = 500;
 function updateObject() {
   document.querySelectorAll(".Object").forEach((Obj) => {
     increaseObjectProp(Obj, "--right", Xval);
-    IsDead(document.querySelector(".Character"), Obj);
+    if (getObjectProp(Obj, "--right") < 1100)
+      IsDead(document.querySelector(".Character"), Obj);
     if (getObjectProp(Obj, "--right") >= 100) Obj.remove();
   });
   if (NextObject <= 0) {
@@ -71,9 +71,9 @@ function createObject() {
 function IsDead(duck, Obj) {
   let DuckBottom = getObjectProp(duck, "bottom");
   let ObjHeight = getObjectProp(Obj, "height");
-  let ObjRight = getObjectProp(Obj, "right") + getObjectProp(Obj, "width");
-  let ObjLeft = getObjectProp(Obj, "left") + getObjectProp(Obj, "width");
-  if (DuckBottom < ObjHeight && 1152 < ObjRight && 88 < ObjLeft) {
+  let ObjRight = getObjectProp(Obj, "right") + getObjectProp(Obj, "width") - 10;
+  let ObjLeft = getObjectProp(Obj, "left") + getObjectProp(Obj, "width") - 10;
+  if (DuckBottom < ObjHeight && 1170 < ObjRight && 90 < ObjLeft) {
     GameOver();
   }
 }
@@ -105,13 +105,9 @@ function playSound(SoundUrl, Loop = false) {
 let inputName = "";
 let Btns = [];
 let isMuted = "";
-Menu();
-
 function Menu() {
-  document.querySelector("#gameScreen").style.opacity = 1;
   document.querySelector("#title").innerHTML = "Duck Man Game";
-  document.querySelector(".Hud").innerHTML = "";
-  inputName = `<input class="PlayerName" placeholder="Enter Your Name..." type="text" />`;
+  inputName = `<input class="PlayerName" placeholder="Enter Your Name..."/>`;
   Btns = [
     `<button class="btn" onclick="startGame()"><b>Start Game</b></button>`,
     `<button class="btn" id="isMuted" onclick="Mute()"></button>`,
@@ -135,45 +131,40 @@ function Mute() {
 }
 function Pause() {
   StartStop();
-  Mute();
-  inputName = "";
-  document.querySelector("#gameScreen").style.opacity = 0.1;
-  document.querySelector(".Menu").style.display = "flex";
+  document.querySelector("#grass").classList.remove("grassBGMotion");
+  document.querySelector(".treesBG").classList.remove("treesBGMotion");
   Btns = [
     `<button class="btn" onclick="Play()"><b>Resume</b></button>`,
-    `<button class="btn" onclick="Menu()">New Game</button>`,
+    `<button class="btn" onclick="window.location.reload()">New Game</button>`,
     `<button class="btn" onclick="Exit()">Exit</button>`,
   ];
+  document.querySelector("#gameScreen").style.opacity = 0.1;
+  document.querySelector(".Menu").style.display = "flex";
   document.querySelector(
     ".Menu"
   ).innerHTML = `<h1>Pause Menu</h1>${Btns[0]}${Btns[1]}${Btns[2]}`;
 }
 function Play() {
+  document.querySelector("#grass").classList.add("grassBGMotion");
+  document.querySelector(".treesBG").classList.add("treesBGMotion");
   StartStop();
-  document.querySelector(".Menu").style.display = "none";
   document.querySelector("#gameScreen").style.opacity = 1;
+  document.querySelector(".Menu").style.display = "none";
 }
 function Exit() {
   if (confirm("Are you sure?")) window.close();
 }
-let PlayerName = "";
 function startGame() {
-  if (inputName) {
-    PlayerName = document.querySelector(".PlayerName").value;
-  }
+  PlayerName = document.querySelector(".PlayerName").value;
   if (PlayerName) {
     document.querySelector(".Menu").style.display = "none";
-    document.querySelector("#gameScreen").style.opacity = 1;
+    document.querySelector("#grass").classList.add("grassBGMotion");
+    document.querySelector(".treesBG").classList.add("treesBGMotion");
     StartStop();
-    (sec = 1), (min = 0);
-    document.querySelector("#title").innerHTML = "Duck Man Game";
-    trees();
-    clouds();
     document.querySelector(".Hud").innerHTML = `
   <div class="Player">Player: ${PlayerName}</div>
   <button class="pause" onclick="Pause()" style="font-size:44px"><i class="fa fa-pause"></i></button>
   <div class="Timer">0</div>`;
-    Timer();
   } else {
     alert("Please enter your name!");
   }
@@ -194,12 +185,15 @@ function GameOver() {
   <tr>
       <th>Place</th>
       <th>Name</th>
-      <th>Time</th>
+      <th>Score</th>
   </tr>
   </thead>
   <tbody id="mainTable"></tbody>
-</table></div><div><button class="btn" onclick="Menu()" style="width: 150px;">Play Again</button><button class="btn" onclick="Exit()" style="width: 150px;">Exit</button></div>`;
-    localStoragePlayerScore(Time, PlayerName);
+</table></div><div><button class="btn" onclick="window.location.reload()" style="width: 150px;">Play Again</button><button class="btn" onclick="Exit()" style="width: 150px;">Exit</button></div>`;
+    localStoragePlayerScore(
+      document.querySelector(".Timer").innerText,
+      PlayerName
+    );
   }, 2000);
 }
 function CreateTble(data) {
@@ -275,10 +269,6 @@ function setCalss(elm, className) {
 function random_number(max, min) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
-function trees() {
-  let treeBG_holder = document.getElementsByClassName("Map")[0];
-  treeBG_holder.innerHTML += `<div class="treesBG"></div>`;
-}
 function localStoragePlayerScore(time, name) {
   let playerStatArry = [];
   if (localStorage.playerStatic)
@@ -298,7 +288,11 @@ function sortToHighScore(arrayObj) {
 
     return 0;
   });
+  if (arrayObj.length > 7) {
+    arrayObj.splice(7, arrayObj.length - 7);
+  }
+  localStorage.playerStatic = JSON.stringify(arrayObj);
+  CreateTble(arrayObj);
   return arrayObj;
 }
-
 //----Nati Pinyan--------------------------------------

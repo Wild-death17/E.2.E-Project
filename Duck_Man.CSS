@@ -35,6 +35,7 @@ body {
   background-color: aquamarine;
 }
 .Hud {
+  font-size: x-large;
   top: 5%;
   width: 100%;
   height: 10%;
@@ -50,34 +51,37 @@ body {
   color: white;
 }
 .Hud .Player,
+.Hud .Points,
 .Hud .pause,
+.Hud .Health,
 .Hud .Timer {
   padding: 10px;
-  font-size: 40px;
-  font-weight: bolder;
   width: fit-content;
 }
 .ground {
   width: 100%;
   height: 4rem;
   position: relative;
-  background-color: rgb(125, 208, 41);
+  background-color: chartreuse;
+  background-image: linear-gradient(chartreuse, forestgreen);
 }
 .ground .topGround {
   position: relative;
   top: 0px;
-  height: 1rem;
-  background-color: rgb(50, 90, 9);
+  z-index: 1;
 }
 #grass {
+  z-index: 0;
   position: absolute;
   width: 100%;
   height: 3rem;
-  bottom: 3rem;
+  bottom: 3.5rem;
   background-size: 300px;
   background-position: 2.5rem 2.5rem;
-  animation: grassBGMotion 3780ms infinite linear;
   background-image: url(./Site_Imgs/BackGround/grass-removebg-preview.png);
+}
+.grassBGMotion {
+  animation: grassBGMotion 3780ms infinite linear;
 }
 @keyframes grassBGMotion {
   0% {
@@ -89,36 +93,40 @@ body {
 }
 
 .Character {
+  z-index: 1;
   --bottom: 0;
   right: 90%;
   bottom: calc(var(--bottom) * 1%);
   width: 80px;
   height: 80px;
   position: absolute;
+  background-image: url(./Site_Imgs/Charecter/duck-removebg-preview.png);
   background-size: 100% 100%;
 }
+
 .Object {
+  z-index: 1;
   --right: 0;
-  width: 80px;
+  width: 100px;
   bottom: 0px;
   right: calc(var(--right) * 1%);
   position: absolute;
   background-size: 100% 100%;
 }
 .Object0 {
-  height: 100px;
+  height: 110px;
   background-image: url(./Site_Imgs/Objects/object0-removebg-preview.png);
 }
 .Object1 {
-  height: 100px;
+  height: 110px;
   background-image: url(./Site_Imgs/Objects/object1-removebg-preview.png);
 }
 .Object2 {
-  height: 50px;
+  height: 60px;
   background-image: url(./Site_Imgs/Objects/object2-removebg-preview.png);
 }
 .Object3 {
-  height: 50px;
+  height: 60px;
   background-image: url(./Site_Imgs/Objects/object3-removebg-preview.png);
 }
 /*----Map----*/
@@ -157,7 +165,6 @@ body {
   text-align: center;
   color: aquamarine;
   font-size: 20em;
-  display: flex;
 }
 /*----Menu----*/
 /*----Table----*/
@@ -165,9 +172,7 @@ body {
   background-color: aquamarine;
   border: black 2px solid;
   border-radius: 2rem;
-  display: flex;
   font-size: xx-large;
-  flex-direction: column;
 }
 th {
   padding: 15px;
@@ -250,6 +255,10 @@ td:nth-child(1) {
   width: 100%;
   background-size: 100%;
   background-position-y: 80px;
+  display: none;
+}
+.treesBGMotion {
+  display: block;
   animation: treesBGMotion 5000ms infinite linear;
 }
 @keyframes treesBGMotion {
